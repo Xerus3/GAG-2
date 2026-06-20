@@ -1,28 +1,49 @@
-local function safeRequire(module)
-    local success, result = pcall(function() return require(module) end)
-    if not success then warn("error requiring module: "..tostring(module).. " got error: "..tostring(result)) return nil end
-    return result
-end
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local SharedModules = ReplicatedStorage:WaitForChild("SharedModules", 10)
-local Networking = SharedModules:WaitForChild("Networking", 10)
-local Flags = SharedModules:WaitForChild("Flags", 10)
-local StealFlags = Flags:WaitForChild("StealFlags", 10)
-local FruitValueCalc = SharedModules:WaitForChild("FruitValueCalc", 10)
 
-local NetworkModule = safeRequire(Networking)
-local StealFlagsModule = safeRequire(StealFlags)
-local FruitValueCalcModule = safeRequire(FruitValueCalc)
+-- Enhanced require function with retry logic
+local function retryRequire(module)
+    local moduleData = nil
+    local attempts = 0
+    while not moduleData and attempts < 20 do
+        local success, result = pcall(function() return require(module) end)
+        if success then
+            moduleData = result
+        else
+            attempts = attempts + 1
+            task.wait(0.5) -- Wait for the module to initialize
+        end
+    end
+    return moduleData
+end
+
+-- Wait for Folders
+local SharedModules = ReplicatedStorage:WaitForChild("SharedModules", 15)
+local Networking = SharedModules:WaitForChild("Networking", 15)
+local Flags = SharedModules:WaitForChild("Flags", 15)
+local StealFlags = Flags:WaitForChild("StealFlags", 15)
+local FruitValueCalc = SharedModules:WaitForChild("FruitValueCalc", 15)
+
+-- Use the retry function
+local NetworkModule = retryRequire(Networking)
+local StealFlagsModule = retryRequire(StealFlags)
+local FruitValueCalcModule = retryRequire(FruitValueCalc)
+
 local LocalPlayer = Players.LocalPlayer
-local Gardens = workspace:WaitForChild("Gardens", 10)
-local PlayerScripts = LocalPlayer:WaitForChild("PlayerScripts", 10)
-local Controllers = PlayerScripts:WaitForChild("Controllers", 10)
-local PlantLifecycleHandler = Controllers:WaitForChild("PlantLifecycleHandler", 10)
-local PlantCycleModule = safeRequire(PlantLifecycleHandler)
-local RunService = game:GetService("RunService")
-local Night = ReplicatedStorage:WaitForChild("Night", 10)
+local Gardens = workspace:WaitForChild("Gardens", 15)
+local PlayerScripts = LocalPlayer:WaitForChild("PlayerScripts", 15)
+local Controllers = PlayerScripts:WaitForChild("Controllers", 15)
+local PlantLifecycleHandler = Controllers:WaitForChild("PlantLifecycleHandler", 15)
+
+-- Safely get the controller
+local PlantCycleModule = retryRequire(PlantLifecycleHandler)
+
+if not NetworkModule or not StealFlagsModule or not PlantCycleModule then
+    warn("Failed to load critical modules. Check game loading.")
+    return
+end
+
+-- Proceed with the rest of your script...
 
 local OwnerPlot
 local startTime = tick()
