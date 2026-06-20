@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 local Networking = require(ReplicatedStorage.SharedModules.Networking)
 
 local PurchaseSeeds = Networking.SeedShop.PurchaseSeed
@@ -39,17 +38,17 @@ local function canAfford(item)
             end
             return (playerdata.Data.Sheckles or 0) >= itemData.price
         end)
-        if success  and result then
+        if success and result then
             return true
         end
     end
     return false
 end
 
---local exclude = {"Apple", "Crate", "RAndom idk"} put the stuff here that you want excluded from auto buy
 local exclude = {}
 
-while wait(0.05) do
+-- The loop now checks if _G.Auto.Buy is still true
+while _G.Auto.Buy do
     for _,seed in pairs(SeedsStock:GetChildren()) do
         if seed and typeof(seed) == "Instance" then
             if seed.Value > 0 then
@@ -72,4 +71,5 @@ while wait(0.05) do
             end 
         end
     end
-end 
+    task.wait(0.05)
+end
