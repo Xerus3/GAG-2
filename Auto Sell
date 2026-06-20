@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Networking = require(ReplicatedStorage.SharedModules.Networking)
 
-while wait(0.5) do
+-- Loop only runs while the Auto.Sell toggle is enabled in your UI
+while _G.Auto.Sell do
     Networking.NPCS.SellAll:Fire()
-end 
+    task.wait(0.5)
+end
