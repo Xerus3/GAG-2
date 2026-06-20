@@ -3,7 +3,7 @@ local Networking = require(game:GetService("ReplicatedStorage").SharedModules.Ne
 
 local OwnerPlot
 while OwnerPlot == nil do
-    wait(0.1)
+    task.wait(0.1)
     for _, plot in pairs(gardens:GetChildren()) do
         if plot:GetAttribute("Owner") == game.Players.LocalPlayer.Name then
             OwnerPlot = plot
@@ -58,8 +58,10 @@ local function harvest(plant)
     end
 end
 
-while wait(0.01) do
+-- The loop now checks if _G.Auto.Harvest is still true
+while _G.Auto.Harvest do
     for i,v in pairs(getharvestableplants()) do
         harvest(v)
     end
+    task.wait(0.01)
 end
